@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#fefaf1] min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4">
+    <h1 class="text-2xl font-bold text-center">Login</h1>
+
+    <input id="email" type="email" placeholder="Email" class="w-full border px-3 py-2 rounded" />
+    <input id="password" type="password" placeholder="Password" class="w-full border px-3 py-2 rounded" />
+
+    <button id="loginBtn" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">
+      Login
+    </button>
+
+    <p id="msg" class="text-center text-sm text-gray-600"></p>
+  </div>
+
+  <script>
+    const btn = document.getElementById('loginBtn');
+    const msg = document.getElementById('msg');
+
+    btn.onclick = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        // store userId for later (e.g., in localStorage)
+        localStorage.setItem('userId', data.userId);
+        msg.textContent = 'Login successful.';
+        // redirect to your frames page
+        window.location.href = 'index.html';
+      } else {
+        msg.textContent = data.message || 'Login failed.';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#fefaf1] min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4">
+    <h1 class="text-2xl font-bold text-center">Create Account</h1>
+
+    <input id="name" type="text" placeholder="Username (no spaces)"
+           class="w-full border px-3 py-2 rounded" />
+    <input id="email" type="email" placeholder="Email"
+           class="w-full border px-3 py-2 rounded" />
+    <input id="phone" type="tel" placeholder="Phone (10 digits)"
+           class="w-full border px-3 py-2 rounded" />
+    <input id="password" type="password" placeholder="Password"
+           class="w-full border px-3 py-2 rounded" />
+
+    <button id="signupBtn"
+            class="w-full bg-orange-400 hover:bg-orange-500 text-white py-2 rounded">
+      Sign Up
+    </button>
+
+    <p id="msg" class="text-center text-sm text-gray-600"></p>
+
+    <p class="text-center text-sm text-gray-700">
+      Already have an account?
+      <a href="login.html" class="text-blue-600 underline">Click here to login</a>
+    </p>
+  </div>
+
+  <script>
+    const btn  = document.getElementById('signupBtn');
+    const msg  = document.getElementById('msg');
+
+    function validUsername(name) {
+      // no spaces, at least 3 chars
+      return /^[^\s]{3,}$/.test(name);
+    }
+
+    function validPassword(pwd) {
+      // at least 8 chars, one letter, one digit, one special char
+      return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(pwd);
+    }
+
+    function validPhone(phone) {
+      return /^\d{10}$/.test(phone);
+    }
+
+    btn.onclick = async () => {
+      const name  = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+
+      // validations
+      if (!validUsername(name)) {
+        msg.textContent = "Username must be at least 3 characters with no spaces.";
+        return;
+      }
+      if (!email) {
+        msg.textContent = "Email is required.";
+        return;
+      }
+      if (!validPhone(phone)) {
+        msg.textContent = "Enter valid 10-digit phone number.";
+        return;
+      }
+      if (!validPassword(password)) {
+        msg.textContent =
+          "Password must be 8+ chars and include letters, numbers, and a special character.";
+        return;
+      }
+
+      // call backend /signup (Node + SQLite server you created)
+      try {
+        const res = await fetch('http://localhost:5000/signup', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ name, email, phone, password })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          msg.textContent = "Signup successful. Redirecting to login...";
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1200);
+        } else {
+          msg.textContent = data.message || "Error creating user.";
+        }
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "Server error during signup.";
+      }
+    };
+  </script>
+</body>
+</html>

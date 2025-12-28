@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#fefaf1] min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-white p-8 rounded-2xl shadow-lg space-y-6 border border-gray-200">
+    <h1 class="text-3xl font-bold text-center text-gray-800">💳 Scan to Pay via UPI</h1>
+
+    <!-- Total Amount -->
+    <div class="bg-[#fffaf3] rounded-xl p-6 shadow-inner border border-yellow-100 space-y-4">
+      <div class="flex justify-between text-xl font-semibold text-gray-700">
+        <span>Total Payable</span>
+        <span class="text-green-600">₹<span id="totalAmount">0</span></span>
+      </div>
+    </div>
+
+    <!-- UPI QR Code -->
+    <div class="flex flex-col items-center space-y-3">
+      <img src="img/template/QR - Copy (2).jpg" alt="Scan QR to Pay" class="w-56 h-56 rounded-xl shadow-md border border-gray-300" />
+      <p class="text-sm text-gray-600 text-center">Scan this QR code with any UPI app like PhonePe, Google Pay, or Paytm.</p>
+	  if paid vai UPI <a href="order-Confirmed.html">Click here</a>
+    </div>
+
+    <!-- COD Info -->
+    <div class="text-center mt-6">
+      <p class="text-lg font-semibold text-gray-700">💵 Prefer COD?</p>
+      <a href="order-Confirmed.html"><button onclick="handleCOD()" class="mt-2 bg-[#ff9800] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#fb8c00] transition">Select Cash on Delivery</button></a>
+    </div>
+
+    <!-- Info -->
+    <p class="text-sm text-gray-500 text-center pt-4">Your payment is secure and encrypted 🔐</p>
+
+    <!-- Instruction -->
+    <div class="mt-6 text-center text-gray-600">
+      <p class="text-sm font-medium">📸 Kindly share a screenshot of your payment or COD selection on WhatsApp at <span class="font-semibold">8446482532</span> to confirm your order.</p>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const totalAmount = urlParams.get("total") || "0";
+    document.getElementById("totalAmount").textContent = totalAmount;
+
+    function handleCOD() {
+      alert("You have selected Cash on Delivery. Please have the exact amount ready upon delivery.");
+    }
+  </script>
+</body>
+</html>

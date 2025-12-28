@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OptiMart</title>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding-top: 160px; /* gives space for fixed header */
+    }
+
+    a {
+      text-decoration: none;
+      color: #6E5A64;
+    }
+
+    /* Fixed Header */
+    .fixedHeader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Top Contact Bar */
+    .topLinks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 20px;
+      background-color: #fafafa;
+    }
+
+    /* Brand Header */
+    .brandHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+    }
+
+    .searchBar input {
+      width: 300px;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .navLinks {
+      display: flex;
+      gap: 20px;
+      padding: 10px 20px;
+      background-color: #e5e5e5;
+      flex-wrap: wrap;
+    }
+
+    .navLinks a {
+      font-size: 16px;
+      font-weight: 500;
+      padding: 6px 10px;
+    }
+
+    .navLinks a:hover {
+      background: #00BAC6;
+      color: white;
+      border-radius: 4px;
+    }
+
+    /* Delivery Banner */
+    .deliveryBanner {
+      background-color: #FDE3BC;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .deliveryBanner .button {
+      background: #00BAC6;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* Dummy Page Content */
+    .content {
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fixedHeader">
+    <div class="topLinks">
+      <div>
+        Try in 3D | OptiMart @office | OptiMart Blog | CoBrowsing
+      </div>
+      <div>
+        Contact us at <a href="mailto:support@OptiMart.com">support@OptiMart.com</a>
+      </div>
+    </div>
+
+    <div class="brandHeader">
+      <div class="logo">
+        <img src="https://via.placeholder.com/60" alt="OptiMart Logo">
+      </div>
+      <div class="searchBar">
+        <input type="text" placeholder="What are you looking for?">
+      </div>
+      <div class="userLinks">
+        <a href="#">Sign In & Sign Up</a> |
+        <a href="#">❤️ Shortlist</a> |
+        <a href="#">🛒 Cart</a>
+      </div>
+    </div>
+
+    <div class="navLinks">
+      <a href="#">Eyeglasses</a>
+      <a href="#">Sunglasses</a>
+      <a href="#">Contact Lenses</a>
+      <a href="#">Power Sunglasses</a>
+      <a href="#">Screen Glasses</a>
+      <a href="#">Progressive Lenses</a>
+      <a href="#" style="background: linear-gradient(90deg, rgba(61,179,168,1) 0%, rgba(220,187,61,1) 100%); color: white;">Eyeglasses at ₹499</a>
+      <a href="#">3D TRY ON</a>
+      <a href="#">BLU</a>
+      <a href="#">Gold</a>
+    </div>
+
+    <div class="deliveryBanner">
+      <div>OptiMart is Delivering across India</div>
+      <div><a class="button" href="#">Know More</a></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <h2>Welcome to OptiMart 👓</h2>
+    <p>This is where your page content starts after the fixed header.</p>
+  </div>
+
+</body>
+</html>

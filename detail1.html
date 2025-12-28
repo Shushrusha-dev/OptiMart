@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eyewear Prescription Upload</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: #f5f0e6;
+    }
+    .table-header { background-color: #c29b6a; color: white; }
+    .table-cell { padding: 10px; border: 1px solid #e5e7eb; text-align: center; }
+    .choose-btn {
+      background-color: #c29b6a;
+      color: #333;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .choose-btn:hover { background-color: #b18b5e; }
+    .loading { @apply animate-spin w-6 h-6 border-2 border-[#c29b6a] border-t-transparent rounded-full mx-auto; }
+  </style>
+</head>
+<body>
+  <div class="full-container p-6 space-y-10">
+
+    <!-- Frame Info -->
+    <div class="flex items-center space-x-6 p-4 bg-white rounded-xl shadow-lg">
+      <img src="https://static5.lenskart.com/media/catalog/product/pro/1/thumbnail/628x301/9df78eab33525d08d6e5fb8d27136e95//l/i/Lenskart-Air-LA-E14360-C1-Eyeglasses_J_1837.jpg"
+           alt="Selected Frame"
+           class="w-48 rounded-lg shadow-md"/>
+      <div>
+        <h3 class="text-xl font-semibold">Selected Frame</h3>
+        <p class="text-lg">OptiMart Fastrack</p>
+        <p class="text-sm"><strong>Material:</strong> Acetate</p>
+        <p class="text-sm"><strong>Color:</strong> Grey</p>
+        <p class="text-sm"><strong>Shape:</strong> Round</p>
+        <p class="text-sm"><strong>Price:</strong> ₹2000</p>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div>
+      <h2 class="text-2xl font-bold mb-4">Upload Your Prescription</h2>
+      <form id="uploadForm" class="space-y-6">
+        <div class="flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 p-6 rounded-lg bg-white max-w-md mx-auto cursor-pointer hover:border-indigo-400 transition-all">
+          <input type="file" id="prescriptionInput" name="prescription" accept="image/*" class="hidden" required />
+          <label for="prescriptionInput" id="prescriptionLabel" class="text-center cursor-pointer w-full">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <p id="uploadText" class="text-base font-medium mt-2">Click to upload your prescription</p>
+            <p class="text-sm text-gray-500 mt-1">JPG / PNG / Clear photo works best</p>
+          </label>
+        </div>
+        <div class="text-center">
+          <button type="submit" id="analyzeBtn"
+                  class="bg-[#c29b6a] hover:bg-[#b18b5e] text-white px-8 py-3 rounded-md font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all">
+            <span id="analyzeText">🔍 AI Analyze Prescription</span>
+            <div id="loadingSpinner" class="loading hidden"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Feedback -->
+    <p id="messageArea" class="text-center text-lg font-medium hidden"></p>
+
+    <!-- Result Section -->
+    
+      <h4 class="text-lg font-semibold mb-4 text-center">Choose Your Perfect Glasses / Coating</h4>
+	  
+      <div class="overflow-x-auto bg-white rounded-lg shadow-md max-h-60 overflow-y-auto">
+        <table class="min-w-full table-auto">
+          <thead class="table-header">
+            <tr>
+              <th class="table-cell">Select</th>
+              <th class="table-cell">Glass / Coating Name</th>
+              <th class="table-cell">Best for Optical Range</th>
+              <th class="table-cell">Price (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="glassesTable">
+            <!-- AI will populate this -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Proceed button -->
+      <div class="text-center mt-6">
+        <button id="proceedBtn"
+                class="bg-[#c29b6a] hover:bg-[#b18b5e] text-white px-8 py-3 rounded-md font-semibold text-lg shadow-lg transition-all">
+          🛒 Proceed to Checkout
+        </button>
+      </div>
+    </div>
+
+    <!-- Floating Chat -->
+    <button onclick="window.open('/chat.html','chat','width=380,height=550')" 
+            style="position:fixed;bottom:25px;right:25px;width:65px;height:65px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 10px 30px rgba(102,126,234,0.4);z-index:9999;transition:all 0.3s ease;">
+      💬
+    </button>
+
+  </div>
+
+  <script>
+    const FRAME_PRICE = 2000;
+    const FRAME_NAME  = "OptiMart Fastrack";
+
+    const uploadForm        = document.getElementById('uploadForm');
+    const prescriptionInput = document.getElementById('prescriptionInput');
+    const uploadText        = document.getElementById('uploadText');
+    const resultSection     = document.getElementById('resultSection');
+    const messageArea       = document.getElementById('messageArea');
+    const glassesTable      = document.getElementById('glassesTable');
+    const proceedBtn        = document.getElementById('proceedBtn');
+    const analyzeBtn        = document.getElementById('analyzeBtn');
+    const analyzeText       = document.getElementById('analyzeText');
+    const loadingSpinner    = document.getElementById('loadingSpinner');
+    const powerDetected     = document.getElementById('powerDetected');
+
+    let currentPrescriptionId = null;
+    let detectedPower = null;
+
+    prescriptionInput.addEventListener('change', () => {
+      if (prescriptionInput.files.length > 0) {
+        uploadText.innerHTML = `
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            ${prescriptionInput.files[0].name}
+          </div>
+        `;
+        analyzeBtn.disabled = false;
+      } else {
+        uploadText.textContent = "Click to upload your prescription";
+        analyzeBtn.disabled = true;
+      }
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = prescriptionInput.files[0];
+      if (!file) return;
+
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert("Please login first.");
+        window.location.href = '/login.html';
+        return;
+      }
+
+      // Show loading
+      analyzeBtn.disabled = true;
+      analyzeText.classList.add('hidden');
+      loadingSpinner.classList.remove('hidden');
+      messageArea.classList.add('hidden');
+
+      try {
+        // 1) Save prescription to DB first
+        const saveForm = new FormData();
+        saveForm.append('prescription', file);
+        saveForm.append('userId', userId);
+
+        const saveRes = await fetch('http://localhost:5000/upload-prescription', {
+          method: 'POST',
+          body: saveForm
+        });
+        const saveData = await saveRes.json();
+        
+        if (!saveData.success) throw new Error('Failed to save prescription');
+        currentPrescriptionId = saveData.prescription.id;
+        console.log('✅ Prescription saved:', saveData.prescription);
+
+        // 2) AI Vision Analysis
+        const analyzeForm = new FormData();
+        analyzeForm.append('prescription', file);
+
+        // ✅ NEW AI VISION CODE
+try {
+  // 2) AI Vision Analysis (NEW)
+  const analyzeForm = new FormData();
+  analyzeForm.append('prescription', file);
+
+  console.log('🤖 Calling AI Vision...');
+  const analyzeRes = await fetch('http://localhost:5000/analyze-prescription-ai', {
+    method: 'POST',
+    body: analyzeForm
+  });
+  const aiData = await analyzeRes.json();
+  console.log('🎯 AI Vision Result:', aiData);
+
+  if (aiData.success) {
+    // ✅ SHOW AI POWER ON SCREEN
+    document.getElementById('powerDetected').innerHTML = `
+      <span class="text-2xl font-bold text-blue-600">${aiData.power}</span>
+      <br><small class="text-green-600">🎯 AI Vision Analysis Complete!</small>
+    `;
+    
+    renderSmartGlasses(aiData.glasses);
+    messageArea.textContent = "✅ AI analyzed your prescription perfectly!";
+    messageArea.classList.add('text-green-600');
+  } else {
+    // Fallback
+    renderTable(getDefaultGlasses());
+    document.getElementById('powerDetected').textContent = `AI Error: ${aiData.message}`;
+  }
+  
+  resultSection.style.display = 'block';
+} catch (error) {
+  console.error('AI Vision failed:', error);
+  renderTable(getDefaultGlasses());
+}
+
+        const aiData = await analyzeRes.json();
+
+        if (aiData.success) {
+          detectedPower = aiData.power || '-2.5'; // Fallback
+          
+          powerDetected.textContent = `Detected power: ${detectedPower} (AI Vision Analysis)`;
+          renderSmartGlasses(aiData.glasses || getGlassesForPower(detectedPower));
+          
+          messageArea.textContent = "✅ AI analyzed your prescription perfectly!";
+          messageArea.classList.add('text-green-600', 'block');
+          resultSection.classList.remove('hidden');
+        } else {
+          throw new Error(aiData.message || 'AI analysis failed');
+        }
+
+      } catch (error) {
+        console.error('AI Analysis error:', error);
+        messageArea.textContent = `⚠️ ${error.message}. Using default recommendations.`;
+        messageArea.classList.add('text-orange-600', 'block');
+        renderTable(getDefaultGlasses());
+        resultSection.classList.remove('hidden');
+      } finally {
+        analyzeBtn.disabled = false;
+        analyzeText.classList.remove('hidden');
+        loadingSpinner.classList.add('hidden');
+      }
+    });
+
+    function renderSmartGlasses(glassesData) {
+      glassesTable.innerHTML = glassesData.map((glass, index) => `
+        <tr class="hover:bg-indigo-50 transition-colors">
+          <td class="table-cell">
+            <input type="radio" name="glassOption" value="${glass.name}|${glass.price}"
+                   ${index === 0 ? "checked" : ""} class="w-4 h-4 text-[#c29b6a]">
+          </td>
+          <td class="table-cell font-medium">${glass.name}</td>
+          <td class="table-cell">${glass.range}</td>
+          <td class="table-cell font-semibold text-[#c29b6a]">₹${glass.price}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTable(glassesData) {
+      glassesTable.innerHTML = glassesData.map((glass, index) => `
+        <tr class="hover:bg-indigo-50">
+          <td class="table-cell">
+            <input type="radio" name="glassOption" value="${glass.name}|${glass.price}"
+                   ${index === 0 ? "checked" : ""}>
+          </td>
+          <td class="table-cell">${glass.name}</td>
+          <td class="table-cell">${glass.range}</td>
+          <td class="table-cell">${glass.price}</td>
+        </tr>
+      `).join('');
+    }
+
+    function getDefaultGlasses() {
+      return [
+        { id: 1, name: "Hard Coat", range: "-2.00 to +2.00", price: 800 },
+        { id: 2, name: "Blue Light Coating", range: "-4.00 to +4.00", price: 1200 },
+        { id: 3, name: "Green Light Coating", range: "-4.00 to +4.00", price: 1100 },
+        { id: 4, name: "Scratch Resistant", range: "-6.00 to +6.00", price: 1500 },
+        { id: 5, name: "UV Protection", range: "-6.00 to +6.00", price: 1300 }
+      ];
+    }
+
+    function getGlassesForPower(power) {
+      const powerNum = parseFloat(power.replace(/[^-0-9.]/g, ''));
+      const absPower = Math.abs(powerNum);
+      
+      let recommendations = [
+        { name: "Blue Light Coating", range: "-4.00 to +4.00", price: 1200 },
+        { name: "Scratch Resistant", range: "-6.00 to +6.00", price: 1500 }
+      ];
+      
+      if (absPower <= 2) {
+        recommendations.unshift({ name: "Hard Coat", range: "-2.00 to +2.00", price: 800 });
+      }
+      
+      return recommendations;
+    }
+
+    proceedBtn.addEventListener('click', async () => {
+      const selected = document.querySelector('input[name="glassOption"]:checked');
+      if (!selected) {
+        alert("Please select a glass/coating option.");
+        return;
+      }
+
+      const [glassName, glassPriceStr] = selected.value.split('|');
+      const glassPrice = Number(glassPriceStr);
+      const total = FRAME_PRICE + glassPrice;
+
+      if (currentPrescriptionId) {
+        try {
+          await fetch('http://localhost:5000/prescription/update-choice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prescriptionId: currentPrescriptionId,
+              frameName: FRAME_NAME,
+              framePrice: FRAME_PRICE,
+              glassName,
+              glassPrice
+            })
+          });
+          console.log('✅ Order choice saved');
+        } catch (e) {
+          console.error('Update choice error:', e);
+        }
+      }
+
+      const url = `buy_add_to_cart.html?glass=${encodeURIComponent(glassName)}&glassPrice=${glassPrice}&framePrice=${FRAME_PRICE}&total=${total}&power=${detectedPower || ''}`;
+      window.location.href = url;
+    });
+  </script>
+</body>
+</html>
